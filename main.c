@@ -28,13 +28,13 @@ static Driver_Config drivers [] =
 {
   {
     /* Solenoid #0 */
-    .in1_pin = 20,
-    .in2_pin = 21
+    .in1_pin = 23,
+    .in2_pin = 24
   },
   {
     /* Solenoid #1 */
-    .in1_pin = 23,
-    .in2_pin = 24
+    .in1_pin = 27,
+    .in2_pin = 22
   }
 };
 
