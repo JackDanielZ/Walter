@@ -104,7 +104,7 @@ _GPIODirection(int pin, const char *dir)
 
    if (-1 == write(fd, dir, strlen(dir)))
    {
-     fprintf(stderr, "Failed to set %s directioni for pin %d!\n", dir, pin);
+     fprintf(stderr, "Failed to set %s direction for pin %d!\n", dir, pin);
      return false;
    }
 
@@ -210,7 +210,6 @@ _usage(void)
 
 int main(int argc, char **argv)
 {
-   int i;
    unsigned int sol_id;
 
    if (argc < 2)
@@ -237,26 +236,17 @@ int main(int argc, char **argv)
    /*
     * Enable GPIO pins
     */
-   for (i = 0; i < NB_SOLENOIDS; i++)
-   {
-     if (!_GPIOExport(drivers[i].in1_pin) || !_GPIOExport(drivers[i].in2_pin)) goto end;
-   }
+   if (!_GPIOExport(drivers[sol_id].in1_pin) || !_GPIOExport(drivers[sol_id].in2_pin)) goto end;
 
    /*
     * Wait GPIO pins to be exported
     */
-   for (i = 0; i < NB_SOLENOIDS; i++)
-   {
-     while (!_GPIOExists(drivers[i].in1_pin) || !_GPIOExists(drivers[i].in2_pin));
-   }
+   while (!_GPIOExists(drivers[sol_id].in1_pin) || !_GPIOExists(drivers[sol_id].in2_pin));
 
    /*
     * Set GPIO directions
     */
-   for (i = 0; i < NB_SOLENOIDS; i++)
-   {
-     if (!_GPIODirection(drivers[i].in1_pin, OUT) || !_GPIODirection(drivers[i].in2_pin, OUT)) goto end;
-   }
+   if (!_GPIODirection(drivers[sol_id].in1_pin, OUT) || !_GPIODirection(drivers[sol_id].in2_pin, OUT)) goto end;
 
    if (!strcmp(argv[1], "start"))
    {
@@ -275,10 +265,7 @@ end:
    /*
     * Disable GPIO pins
     */
-   for (i = 0; i < 2; i++)
-   {
-     _GPIOUnexport(drivers[i].in1_pin);
-     _GPIOUnexport(drivers[i].in2_pin);
-   }
+   _GPIOUnexport(drivers[sol_id].in1_pin);
+   _GPIOUnexport(drivers[sol_id].in2_pin);
    return 0;
 }
