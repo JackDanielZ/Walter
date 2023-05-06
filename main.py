@@ -23,8 +23,8 @@ if GPIOExists(in1) == False:
 if GPIOExists(in2) == False:
     GPIOExport(in2)
 
-while GPIOExists(in1) == False and GPIOExists(in2) == False:
-    pass
+while GPIOIsDirectionReady(in1) == False and GPIOIsDirectionReady(in2) == False:
+    time.sleep(1)
 
 GPIODirectionSet(in1, OUT)
 GPIODirectionSet(in2, OUT)
