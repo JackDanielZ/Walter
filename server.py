@@ -16,7 +16,7 @@ import gpio
 # - pause_solenoid Solenoid_0|1
 # - close_solenoid Solenoid_0|1
 
-pins = {
+solenoids_infos = {
         "0": { "in1" : 24, "in2" : 23 },
         "1": { "in1" : 22, "in2" : 27 }
         }
@@ -36,14 +36,14 @@ def task_consume(task):
         sys.stdout.flush()
         elts = action[1].split(" ")
         if elts[0] == "open_solenoid":
-            gpio.GPIOWrite(pins[elts[1]]["in1"], gpio.LOW)
-            gpio.GPIOWrite(pins[elts[1]]["in2"], gpio.HIGH)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in1"], gpio.LOW)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in2"], gpio.HIGH)
         elif elts[0] == "close_solenoid":
-            gpio.GPIOWrite(pins[elts[1]]["in1"], gpio.HIGH)
-            gpio.GPIOWrite(pins[elts[1]]["in2"], gpio.LOW)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in1"], gpio.HIGH)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in2"], gpio.LOW)
         elif elts[0] == "pause_solenoid":
-            gpio.GPIOWrite(pins[elts[1]]["in1"], gpio.LOW)
-            gpio.GPIOWrite(pins[elts[1]]["in2"], gpio.LOW)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in1"], gpio.LOW)
+            gpio.GPIOWrite(solenoids_infos[elts[1]]["in2"], gpio.LOW)
 
         task.pop(0)
         print(datetime.now(), "- ", task)
@@ -70,9 +70,9 @@ sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
 
-for sol in pins:
-    for pin in pins[sol]:
-        pin_id = pins[sol][pin]
+for sol in solenoids_infos:
+    for pin in solenoids_infos[sol]:
+        pin_id = solenoids_infos[sol][pin]
         if gpio.GPIOExists(pin_id) == False:
             gpio.GPIOExport(pin_id)
         while gpio.GPIOIsDirectionReady(pin_id) == False:
@@ -96,7 +96,7 @@ while True:
             nb_elts = len(elts)
             task = []
             if elts[0] == "open_water":
-                if nb_elts == 3 and str(elts[1]) in pins:
+                if nb_elts == 3 and str(elts[1]) in solenoids_infos:
                     m = re.search("([0-9]+)([hms])", elts[2])
                     if m == None: continue
 
