@@ -3,8 +3,8 @@ import time
 import argparse
 
 pins = {
-        "Solenoid_0": { "in1" : 23, "in2" : 24 },
-        "Solenoid_1": { "in1" : 27, "in2" : 22 }
+        "Solenoid_0": { "in1" : 24, "in2" : 23 },
+        "Solenoid_1": { "in1" : 22, "in2" : 27 }
         }
 
 parser = argparse.ArgumentParser()

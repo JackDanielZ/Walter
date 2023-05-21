@@ -34,3 +34,4 @@ def GPIOWrite(pin, value):
     with open(GPIO_ROOT+"/gpio"+str(pin)+"/value", FMODE) as f:
         f.write(str(value))
         f.flush()
+        print("Write", value, "to pin", pin)
