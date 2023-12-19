@@ -23,10 +23,6 @@ solenoids_infos = {
 
 server_address = '/tmp/walter_uds'
 
-def write_log(s):
-    print(datetime.now(), "- ", s)
-    sys.stdout.flush()
-
 def task_consume(task):
     action = task[0]
     timeout = action[0]
@@ -46,8 +42,6 @@ def task_consume(task):
             gpio.GPIOWrite(solenoids_infos[elts[1]]["in2"], gpio.LOW)
 
         task.pop(0)
-        print(datetime.now(), "- ", task)
-        sys.stdout.flush()
 
 print(datetime.now(), "- ", "Launch server")
 sys.stdout.flush()
@@ -119,20 +113,29 @@ while True:
 
             if task != []:
                 tasks.append(task)
+                print(datetime.now(), "- ", tasks)
+                sys.stdout.flush()
                 task_consume(task)
         connection.close()
     else:
         old_tasks = tasks
         tasks = []
+        task_updated = False
         for task in old_tasks:
-            if task == []: continue
+            if task == []:
+                task_updated = True
+                continue
             action = task[0]
-            if action == []: continue
+            if action == []:
+                task_updated = True
+                continue
             timeout = action[0]
-            print(datetime.now(), "- ", timeout)
-            sys.stdout.flush()
             tasks.append(task)
             if timeout != 0:
                 action[0] -= 1
             else:
                 task_consume(task)
+                task_updated = True
+        if task_updated:
+            print(datetime.now(), "- ", tasks)
+            sys.stdout.flush()
