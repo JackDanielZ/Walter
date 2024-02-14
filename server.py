@@ -15,6 +15,9 @@ import gpio
 # - open_solenoid Solenoid_0|1
 # - pause_solenoid Solenoid_0|1
 # - close_solenoid Solenoid_0|1
+# - cancel_next_open: cancel next open operation
+
+cancel_next_open = False
 
 solenoids_infos = {
         "0": { "in1" : 24, "in2" : 23 },
@@ -90,7 +93,7 @@ while True:
             nb_elts = len(elts)
             task = []
             if elts[0] == "open_water":
-                if nb_elts == 3 and str(elts[1]) in solenoids_infos:
+                if cancel_next_open == False and nb_elts == 3 and str(elts[1]) in solenoids_infos:
                     m = re.search("([0-9]+)([hms])", elts[2])
                     if m == None: continue
 
@@ -102,11 +105,14 @@ while True:
                     task.append([5, "pause_solenoid {}".format(elts[1])])
                     task.append([time, "close_solenoid {}".format(elts[1])])
                     task.append([5, "pause_solenoid {}".format(elts[1])])
+                cancel_next_open = False
             elif elts[0] == "stop":
-                    task.append([0, "close_solenoid 0"])
-                    task.append([0, "close_solenoid 1"])
-                    task.append([5, "pause_solenoid 0"])
-                    task.append([0, "pause_solenoid 1"])
+                task.append([0, "close_solenoid 0"])
+                task.append([0, "close_solenoid 1"])
+                task.append([5, "pause_solenoid 0"])
+                task.append([0, "pause_solenoid 1"])
+            elif elts[0] == "cancel_next_open":
+                cancel_next_open = True
             else:
                 print(datetime.now(), "- ", "Unrecognized command")
                 sys.stdout.flush()
