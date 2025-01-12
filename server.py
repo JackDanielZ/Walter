@@ -31,7 +31,7 @@ def task_consume(task):
     timeout = action[0]
 
     if timeout == 0:
-        print(datetime.now(), "- ", action[1])
+        print(datetime.now(), "-", action[1])
         sys.stdout.flush()
         elts = action[1].split(" ")
         if elts[0] == "open_solenoid":
@@ -46,14 +46,14 @@ def task_consume(task):
 
         task.pop(0)
 
-print(datetime.now(), "- ", "Launch server")
+print(datetime.now(), "-", "Launch server")
 sys.stdout.flush()
 
 # Make sure the socket does not already exist
 try:
     os.unlink(server_address)
 except OSError:
-    print(datetime.now(), "- ", "Exception")
+    print(datetime.now(), "-", "Exception")
     sys.stdout.flush()
     if os.path.exists(server_address):
         raise
@@ -86,26 +86,29 @@ while True:
         connection, client_address = sock.accept()
         # Read data
         data = connection.recv(256)
-        print(datetime.now(), "- ", "Received command:", data)
+        print(datetime.now(), "-", "Received command:", data)
         sys.stdout.flush()
         if data:
             elts = data.decode('utf-8').split(" ")
             nb_elts = len(elts)
             task = []
             if elts[0] == "open_water":
-                if cancel_next_open == False and nb_elts == 3 and str(elts[1]) in solenoids_infos:
-                    m = re.search("([0-9]+)([hms])", elts[2])
-                    if m == None: continue
+                if cancel_next_open == True:
+                    print(datetime.now(), "-", "Open cancelled")
+                    cancel_next_open = False
+                else:
+                    if nb_elts == 3 and str(elts[1]) in solenoids_infos:
+                        m = re.search("([0-9]+)([hms])", elts[2])
+                        if m == None: continue
 
-                    time = int(m.group(1))
-                    if m.group(2) == 'm': time *= 60
-                    if m.group(2) == 'h': time *= 3600
+                        time = int(m.group(1))
+                        if m.group(2) == 'm': time *= 60
+                        if m.group(2) == 'h': time *= 3600
 
-                    task.append([0, "open_solenoid {}".format(elts[1])])
-                    task.append([5, "pause_solenoid {}".format(elts[1])])
-                    task.append([time, "close_solenoid {}".format(elts[1])])
-                    task.append([5, "pause_solenoid {}".format(elts[1])])
-                cancel_next_open = False
+                        task.append([0, "open_solenoid {}".format(elts[1])])
+                        task.append([5, "pause_solenoid {}".format(elts[1])])
+                        task.append([time, "close_solenoid {}".format(elts[1])])
+                        task.append([5, "pause_solenoid {}".format(elts[1])])
             elif elts[0] == "stop":
                 task.append([0, "close_solenoid 0"])
                 task.append([0, "close_solenoid 1"])
@@ -114,12 +117,12 @@ while True:
             elif elts[0] == "cancel_next_open":
                 cancel_next_open = True
             else:
-                print(datetime.now(), "- ", "Unrecognized command")
+                print(datetime.now(), "-", "Unrecognized command")
                 sys.stdout.flush()
 
             if task != []:
                 tasks.append(task)
-                print(datetime.now(), "- ", tasks)
+                print(datetime.now(), "-", tasks)
                 sys.stdout.flush()
                 task_consume(task)
         connection.close()
@@ -143,5 +146,5 @@ while True:
                 task_consume(task)
                 task_updated = True
         if task_updated:
-            print(datetime.now(), "- ", tasks)
+            print(datetime.now(), "-", tasks)
             sys.stdout.flush()
